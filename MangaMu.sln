@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32516.85
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MangaMu", "MangaMu\MangaMu.csproj", "{C52F37E8-CA20-4C34-AF8A-3629216BC76B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MangaMu.Plugins", "MangaMu.Plugins\MangaMu.Plugins.csproj", "{8213605C-0460-4829-93BC-43C21505DCE7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C52F37E8-CA20-4C34-AF8A-3629216BC76B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C52F37E8-CA20-4C34-AF8A-3629216BC76B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C52F37E8-CA20-4C34-AF8A-3629216BC76B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C52F37E8-CA20-4C34-AF8A-3629216BC76B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8213605C-0460-4829-93BC-43C21505DCE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8213605C-0460-4829-93BC-43C21505DCE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8213605C-0460-4829-93BC-43C21505DCE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8213605C-0460-4829-93BC-43C21505DCE7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0A297D80-80A1-4430-82D3-9890AFCB8B7C}
+	EndGlobalSection
+EndGlobal
