@@ -1,22 +1,25 @@
+using MangaMu;
+using MangaMu.Plugin;
+using MangaMu.Repositories;
+using Microsoft.Extensions.FileProviders;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// Services
+builder.RegisterDependencies();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment()) {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseAuthorization();
+//app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+
+app.UseStaticFiles(new StaticFileOptions {
+    FileProvider = new PhysicalFileProvider(
+           Path.Combine(builder.Environment.ContentRootPath, "assets")),
+    RequestPath = "/assets"
+});
 
 app.Run();

@@ -3,9 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32516.85
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MangaMu", "MangaMu\MangaMu.csproj", "{C52F37E8-CA20-4C34-AF8A-3629216BC76B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MangaMu", "MangaMu\MangaMu.csproj", "{C52F37E8-CA20-4C34-AF8A-3629216BC76B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MangaMu.Plugins", "MangaMu.Plugins\MangaMu.Plugins.csproj", "{8213605C-0460-4829-93BC-43C21505DCE7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MangaMu.Plugin", "MangaMu.Plugins\MangaMu.Plugin.csproj", "{8213605C-0460-4829-93BC-43C21505DCE7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MangaMu.Plugin.Manga4Life", "MangaMu.Plugin.Manga4Life\MangaMu.Plugin.Manga4Life.csproj", "{1A90D4C2-75E6-4DAF-86B1-B8BA127D5312}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MangaMu.Test", "MangaMu.Test\MangaMu.Test.csproj", "{EF69E5EA-203E-46DD-95C8-65937F5C8414}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MangaMu.Plugin.MangaDex", "MangaMu.Plugin.MangaDex\MangaMu.Plugin.MangaDex.csproj", "{CCFA541A-71F8-4EAD-B84B-F5CE1EBA1D34}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +27,18 @@ Global
 		{8213605C-0460-4829-93BC-43C21505DCE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8213605C-0460-4829-93BC-43C21505DCE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8213605C-0460-4829-93BC-43C21505DCE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A90D4C2-75E6-4DAF-86B1-B8BA127D5312}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A90D4C2-75E6-4DAF-86B1-B8BA127D5312}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A90D4C2-75E6-4DAF-86B1-B8BA127D5312}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A90D4C2-75E6-4DAF-86B1-B8BA127D5312}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF69E5EA-203E-46DD-95C8-65937F5C8414}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF69E5EA-203E-46DD-95C8-65937F5C8414}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF69E5EA-203E-46DD-95C8-65937F5C8414}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF69E5EA-203E-46DD-95C8-65937F5C8414}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCFA541A-71F8-4EAD-B84B-F5CE1EBA1D34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCFA541A-71F8-4EAD-B84B-F5CE1EBA1D34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCFA541A-71F8-4EAD-B84B-F5CE1EBA1D34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCFA541A-71F8-4EAD-B84B-F5CE1EBA1D34}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

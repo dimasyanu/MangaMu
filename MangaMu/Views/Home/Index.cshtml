@@ -1,0 +1,40 @@
+﻿@{
+    Layout = "../Layouts/Index";
+}
+
+@section SetupScripts {
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"
+        integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
+        crossorigin="anonymous"></script>
+}
+
+@section PostScripts {
+
+}
+
+<button id="update-btn" class="uk-button uk-button-default">Update Database</button>
+
+<script>
+    $('#update-btn').click(function(e) {
+        $.ajax({
+            url: '/Api/Plugin/GetPlugins',
+            success: function(res) {
+                console.log(res);
+            },
+            error: function(err) {
+                console.log(err);
+            }
+        });
+
+        $.ajax({
+            method: 'POST',
+            url: '/Api/Plugin/UpdateDatabase/Manga4Life',
+            success: function (res) {
+                console.log(res);
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    });
+</script>

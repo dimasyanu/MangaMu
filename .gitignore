@@ -110,3 +110,12 @@ dist
 
 /MangaMu.Plugins/bin
 /MangaMu.Plugins/obj
+
+/MangaMu.Test/bin
+/MangaMu.Test/obj
+
+/Mangamu.Plugin.*/bin
+/Mangamu.Plugin.*/obj
+
+/MangaMu.Plugins/Databases
+/Mangamu.Plugin.*.db
