@@ -7,6 +7,7 @@ namespace MangaMu.Plugin
         public abstract string Name { get; }
         public abstract string LogoUrl { get; }
 
+        public abstract IEnumerable<IMangaInfo> GetMangaList();
         public abstract IEnumerable<IChapter> GetChapters();
         public abstract IMangaInfo GetInfo(Guid id);
         public abstract Task<bool> UpdateDatabase();
@@ -15,9 +16,12 @@ namespace MangaMu.Plugin
 
         public PluginBase()
         {
-            var dbDirPath = Path.GetDirectoryName(Path.GetDirectoryName(GetType().Assembly.Location) + "\\Databases");
-            DbFilePath = $"{dbDirPath}/{Name}.db";
-            if (Directory.Exists(dbDirPath)) Directory.CreateDirectory(dbDirPath);
+            var baseDirPath = Path.GetDirectoryName(GetType().Assembly.Location);
+            var dbDirPath = Path.Combine(baseDirPath, "Plugins", Name);
+            DbFilePath = Path.Combine(dbDirPath, $"data.db");
+
+            if (!Directory.Exists(dbDirPath)) Directory.CreateDirectory(dbDirPath);
+
             if (!File.Exists(DbFilePath)) File.Create(DbFilePath);
         }
     }

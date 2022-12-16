@@ -1,6 +1,6 @@
 ﻿using MangaMu.Contracts;
 
-namespace MangaMu.Models
+namespace MangaMu.Plugin.Models
 {
     public class PluginListItem : IPluginListItem
     {

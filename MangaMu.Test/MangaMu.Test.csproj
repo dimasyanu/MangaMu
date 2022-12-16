@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MangaMu.Plugin.Manga4Life\MangaMu.Plugin.Manga4Life.csproj" />
     <ProjectReference Include="..\MangaMu\MangaMu.csproj" />
   </ItemGroup>
 

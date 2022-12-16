@@ -1,6 +1,6 @@
 ﻿using MangaMu.Contracts;
-using MangaMu.Models;
 using MangaMu.Plugin;
+using MangaMu.Plugin.Models;
 
 namespace MangaMu.Repositories
 {

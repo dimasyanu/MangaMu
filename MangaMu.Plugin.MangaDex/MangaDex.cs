@@ -18,6 +18,11 @@ namespace MangaMu.Plugin.Providers
             throw new NotImplementedException();
         }
 
+        public override IEnumerable<IMangaInfo> GetMangaList()
+        {
+            throw new NotImplementedException();
+        }
+
         public override Task<bool> UpdateDatabase()
         {
             throw new NotImplementedException();
