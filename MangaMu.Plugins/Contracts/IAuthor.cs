@@ -1,9 +1,7 @@
 ﻿namespace MangaMu.Plugin.Contracts
 {
-    public interface IChapter
+    public interface IAuthor
     {
-        Guid Id { get; set; }
         string Name { get; set; }
     }
 }
-

@@ -3,11 +3,10 @@ using MangaMu.Plugin.Contracts;
 using MangaMu.Plugin.Manga4Life;
 using MangaMu.Plugin.Models;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace MangaMu.Plugin.Providers
 {
-    public class Manga4Life : PluginBase, IDisposable
+    public class Manga4Life : PluginBase
     {
         public override string Name => "Manga4Life";
         public override string LogoUrl => "https://manga4life.com/media/favicon.png";
@@ -15,72 +14,204 @@ namespace MangaMu.Plugin.Providers
         private string _pageUrl => "http://localhost:8000/search.html";
         private string _connectionString => $"Data Source={DbFilePath};Cache=Shared";
 
-        private readonly PluginDbContext _dbContext;
+        public readonly PluginDbContext DbContext;
 
         public Manga4Life() : base()
         {
-            _dbContext = new PluginDbContext(_connectionString);
+            DbContext = new PluginDbContext(_connectionString);
         }
 
-        public override IEnumerable<IMangaInfo> GetMangaList()
+        public override IEnumerable<IManga> GetMangaList()
         {
-            return _dbContext.Mangas.ToList();
+            return DbContext.Mangas.ToList();
         }
 
-        public override IEnumerable<IChapter> GetChapters()
+        public override IEnumerable<IChapter> GetChapters(Guid mangaId)
         {
-            throw new NotImplementedException();
+            return DbContext.Mangas.First(x => x.Id == mangaId).Chapters;
         }
 
-        public override IMangaInfo GetInfo(Guid id)
+        public override IManga GetMangaInfo(Guid id)
         {
-            throw new NotImplementedException();
+            return DbContext.Mangas.Find(id);
         }
 
         public override Task<bool> UpdateDatabase()
         {
-            var items = CrawlPage();
+            var crawlResult = CrawlPage();
+
+            UpsertFilters(crawlResult.CrawlFilter);
+            UpsertMangas(crawlResult.MangaList);
+
             return Task.FromResult(true);
         }
 
-        private IEnumerable<IMangaInfo> CrawlPage() => CrawlPage(_pageUrl);
-
-        public IEnumerable<IMangaInfo> CrawlPage(string url)
+        private void UpsertFilters(CrawlFilter filters)
         {
-            var jsonStr = "";
+            var newGenres = new List<Genre>();
+            var newStatuses = new List<Status>();
+            var newTypes = new List<Models.MangaType>();
+            var dbGenres = DbContext.Genres.ToList();
+            var dbStatuses = DbContext.Statuses.ToList();
+            var dbTypes = DbContext.Types.ToList();
+
+            foreach(var genre in filters.Genre) {
+                if (dbGenres.Any(x => x.Name.ToLower() == genre.ToLower())) continue;
+                newGenres.Add(new Genre { Name = genre, Alias = SlugHelper.GenerateSlug(genre) });
+            }
+            if (newGenres.Any()) DbContext.Genres.AddRange(newGenres);
+
+            foreach(var type in filters.Type) {
+                if (dbTypes.Any(x => x.Name.ToLower() == type.ToLower())) continue;
+                newTypes.Add(new Models.MangaType { Name = type, Alias = SlugHelper.GenerateSlug(type) });
+            }
+            if (newTypes.Any()) DbContext.Types.AddRange(newTypes);
+
+            foreach(var status in filters.PublishStatus) {
+                if (dbStatuses.Any(x => x.Name.ToLower() == status.ToLower())) continue;
+                newStatuses.Add(new Status { Name = status, Alias = SlugHelper.GenerateSlug(status) });
+            }
+            if (newStatuses.Any()) DbContext.Statuses.AddRange(newStatuses);
+
+            var success = DbContext.SaveChanges();
+            Console.WriteLine(success);
+        }
+
+        private void UpsertMangas(IEnumerable<MangaSourceDto> mangas)
+        {
+            var dbMangas = DbContext.Mangas.ToList();
+            var dbAuthors = DbContext.Authors.ToList();
+            var dbGenres = DbContext.Genres.ToList();
+            var dbStatuses = DbContext.Statuses.ToList();
+            var dbTypes = DbContext.Types.ToList();
+
+            var newMangas = new List<Manga>();
+            var newAuthors = new List<Author>();
+
+            var distinctAuthors = mangas.SelectMany(x => x.A).Distinct();
+            foreach (var author in distinctAuthors) {
+                if (dbAuthors.Any(x => x.Name == author)) continue;
+                newAuthors.Add(new Author { Name = author });
+            }
+            if (newAuthors.Any()) dbAuthors.AddRange(newAuthors);
+
+            foreach (var item in mangas) {
+                var authors = item.A.Select(x => dbAuthors.FirstOrDefault(y => y.Name == x));
+                var genres = item.G.Select(x => dbGenres.FirstOrDefault(y => y.Name.ToLower() == x.ToLower()));
+                var type = dbTypes.FirstOrDefault(x => x.Name == item.T);
+
+                // Update
+                var dbManga = dbMangas.FirstOrDefault(x => x.Key == item.V);
+                if (dbManga != null) {
+                    dbManga.Name = item.I;
+                    dbManga.Genres = genres as ICollection<Genre>;
+                    dbManga.Type = type;
+                    dbManga.Authors = authors as ICollection<Author>;
+                    dbManga.UpdatedAt = DateTime.Now;
+                    continue;
+                }
+
+                // Create
+                var newManga = new Manga {
+                    Name = item.I,
+                    ImageUrl = $"https://temp.compsci88.com/cover/{item.I}.jpg",
+                    Key = item.V,
+                    Authors = authors as ICollection<Author>,
+                    Genres = genres as ICollection<Genre>,
+                    Type = type,
+                    PublishedAt = item.Ls == "0" ? null : DateTime.Parse(item.Ls),
+                    UpdatedAt = DateTime.Now,
+                };
+                newMangas.Add(newManga);
+            }
+            if (newMangas.Any()) DbContext.Mangas.AddRange(newMangas);
+
+            DbContext.SaveChanges();
+        }
+
+        private CrawlResult CrawlPage() => CrawlPage(_pageUrl);
+
+        public CrawlResult CrawlPage(string url)
+        {
+            IEnumerable<MangaSourceDto> mangaList = new List<MangaSourceDto>();
+            CrawlFilter filters = null;
             using (var stream = url.GetStreamAsync().Result) {
                 using var reader = new StreamReader(stream);
                 while (!reader.EndOfStream) {
                     var currLine = reader.ReadLine().TrimStart();
-                    if (!currLine.StartsWith("vm.Directory")) continue;
 
-                    for (var i = 0; true; i++) {
-                        var currChar = currLine[i];
-                        if (currChar != '=') continue;
-                        jsonStr = currLine
-                            .Substring(i + 1)
-                            .TrimStart()
-                            .TrimEnd(';');
-                        break;
+                    if (currLine.StartsWith("vm.Directory")) {
+                        mangaList = ExtractMangaList(currLine);
+                        continue;
                     }
-                    break;
+
+                    if (currLine.StartsWith("vm.AvailableFilters")) {
+                        var jsonStr = currLine;
+                        while(currLine != "};") {
+                            currLine = reader.ReadLine().TrimStart().TrimEnd();
+                            jsonStr += $"\n{currLine}";
+                        }
+                        jsonStr.TrimEnd(';');
+
+                        filters = ExtractFilters(jsonStr);
+                        continue;
+                    }
                 }
             }
 
-            var objects = JsonConvert.DeserializeObject<IEnumerable<MangaSourceDto>>(jsonStr);
-            var results = objects.Select(x => new Manga {
-                Name = x.I,
-                Key = x.V,
-                Authors = string.Join(", ", x.A),
-            }).ToList();
+            var results = new CrawlResult {
+                CrawlFilter = filters,
+                MangaList = mangaList
+            };
             return results;
         }
 
-        public void Dispose()
+        public IEnumerable<MangaSourceDto> ExtractMangaList(string lineStr)
         {
-            throw new NotImplementedException();
+            var listJsonStr = "";
+            for (var i = 0; true; i++) {
+                var currChar = lineStr[i];
+                if (currChar != '=') continue;
+                listJsonStr = lineStr
+                    .Substring(i + 1)
+                    .TrimStart()
+                    .TrimEnd(';');
+                break;
+            }
+            var listDto = JsonConvert.DeserializeObject<IEnumerable<MangaSourceDto>>(listJsonStr);
+            return listDto;
         }
 
-        public void EnsureDbCreated() => _dbContext.Database.EnsureCreated();
+        public CrawlFilter ExtractFilters(string lineStr)
+        {
+            var listJsonStr = "";
+            for (var i = 0; true; i++) {
+                var currChar = lineStr[i];
+                if (currChar != '=') continue;
+                listJsonStr = lineStr
+                    .Substring(i + 1)
+                    .TrimStart()
+                    .TrimEnd(';');
+                break;
+            }
+            var listDto = JsonConvert.DeserializeObject<CrawlFilter>(listJsonStr);
+            return listDto;
+        }
+
+        public void EnsureDbCreated() => DbContext.Database.EnsureCreated();
+    }
+
+    public class CrawlResult
+    {
+        public IEnumerable<MangaSourceDto> MangaList { get; set; }
+        public CrawlFilter CrawlFilter { get; set; }
+    }
+
+    public class CrawlFilter
+    {
+        public IEnumerable<string> PublishStatus { get; set; }
+        public IEnumerable<string> ScanStatus { get; set; }
+        public IEnumerable<string> Type { get; set; }
+        public IEnumerable<string> Genre { get; set; }
     }
 }

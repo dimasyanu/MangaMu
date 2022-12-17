@@ -8,17 +8,17 @@ namespace MangaMu.Plugin.Providers
 
         public override string LogoUrl => "https://mangadex.org/favicon.svg";
 
-        public override IEnumerable<IChapter> GetChapters()
+        public override IEnumerable<IChapter> GetChapters(Guid mangaId)
         {
             throw new NotImplementedException();
         }
 
-        public override IMangaInfo GetInfo(Guid id)
+        public override IManga GetMangaInfo(Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public override IEnumerable<IMangaInfo> GetMangaList()
+        public override IEnumerable<IManga> GetMangaList()
         {
             throw new NotImplementedException();
         }

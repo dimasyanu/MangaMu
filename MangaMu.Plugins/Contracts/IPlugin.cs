@@ -6,7 +6,7 @@
         string LogoUrl { get; }
 
         Task<bool> UpdateDatabase();
-        IEnumerable<IChapter> GetChapters();
-        IMangaInfo GetInfo(Guid id);
+        IEnumerable<IChapter> GetChapters(Guid mangaId);
+        IManga GetMangaInfo(Guid id);
     }
 }
