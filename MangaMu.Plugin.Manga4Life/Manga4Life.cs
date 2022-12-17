@@ -3,6 +3,7 @@ using MangaMu.Plugin.Contracts;
 using MangaMu.Plugin.Manga4Life;
 using MangaMu.Plugin.Models;
 using Newtonsoft.Json;
+using System.Security.Cryptography.X509Certificates;
 
 namespace MangaMu.Plugin.Providers
 {
@@ -21,7 +22,7 @@ namespace MangaMu.Plugin.Providers
             DbContext = new PluginDbContext(_connectionString);
         }
 
-        public override IEnumerable<IManga> GetMangaList()
+        public override IEnumerable<Manga> GetMangaList()
         {
             return DbContext.Mangas.ToList();
         }
@@ -31,7 +32,7 @@ namespace MangaMu.Plugin.Providers
             return DbContext.Mangas.First(x => x.Id == mangaId).Chapters;
         }
 
-        public override IManga GetMangaInfo(Guid id)
+        public override Manga GetMangaInfo(Guid id)
         {
             return DbContext.Mangas.Find(id);
         }
@@ -93,36 +94,60 @@ namespace MangaMu.Plugin.Providers
                 if (dbAuthors.Any(x => x.Name == author)) continue;
                 newAuthors.Add(new Author { Name = author });
             }
-            if (newAuthors.Any()) dbAuthors.AddRange(newAuthors);
+            if (newAuthors.Any()) DbContext.Authors.AddRange(newAuthors);
 
             foreach (var item in mangas) {
-                var authors = item.A.Select(x => dbAuthors.FirstOrDefault(y => y.Name == x));
-                var genres = item.G.Select(x => dbGenres.FirstOrDefault(y => y.Name.ToLower() == x.ToLower()));
                 var type = dbTypes.FirstOrDefault(x => x.Name == item.T);
+                var status = dbStatuses.FirstOrDefault(x => x.Name == item.Ps);
+                var dbManga = dbMangas.FirstOrDefault(x => x.Key == item.Lt);
 
                 // Update
-                var dbManga = dbMangas.FirstOrDefault(x => x.Key == item.V);
                 if (dbManga != null) {
-                    dbManga.Name = item.I;
-                    dbManga.Genres = genres as ICollection<Genre>;
+                    dbManga.Name = item.S;
+                    dbManga.Alias = item.I;
+                    dbManga.ImageUrl = $"https://temp.compsci88.com/cover/{item.I}.jpg";
                     dbManga.Type = type;
-                    dbManga.Authors = authors as ICollection<Author>;
+                    dbManga.Status = status;
                     dbManga.UpdatedAt = DateTime.Now;
-                    continue;
+                }
+                // Create
+                else {
+                    dbManga = new Manga {
+                        Name = item.S,
+                        Alias = item.I,
+                        ImageUrl = $"https://temp.compsci88.com/cover/{item.I}.jpg",
+                        Key = item.Lt,
+                        Type = type,
+                        Status = status,
+                        PublishedAt = item.Ls == "0" ? null : DateTime.Parse(item.Ls),
+                        UpdatedAt = DateTime.Now,
+                    };
+                    newMangas.Add(dbManga);
                 }
 
-                // Create
-                var newManga = new Manga {
-                    Name = item.I,
-                    ImageUrl = $"https://temp.compsci88.com/cover/{item.I}.jpg",
-                    Key = item.V,
-                    Authors = authors as ICollection<Author>,
-                    Genres = genres as ICollection<Genre>,
-                    Type = type,
-                    PublishedAt = item.Ls == "0" ? null : DateTime.Parse(item.Ls),
-                    UpdatedAt = DateTime.Now,
-                };
-                newMangas.Add(newManga);
+                var genres = item.G;
+                if (genres.Any()) {
+                    var dbMangaGenres = DbContext.MangaGenres.Where(x => x.MangaId == dbManga.Id).ToList();
+                    var newMangaGenres = new List<MangaGenre>();
+                    foreach(var genre in genres) {
+                        if (dbMangaGenres.Any(x => x.Genre.Name == genre)) continue;
+                        var dbGenre = DbContext.Genres.First(x => x.Name == genre);
+                        newMangaGenres.Add(new MangaGenre { MangaId = dbManga.Id, GenreId = dbGenre.Id });
+                    }
+                    if (newMangaGenres.Any()) DbContext.MangaGenres.AddRange(newMangaGenres);
+                }
+
+                var authors = item.A;
+                if (authors.Any()) {
+                    var dbMangaAuthors = DbContext.MangaAuthors.Where(x => x.MangaId == dbManga.Id).ToList();
+                    var newMangaAuthors = new List<MangaAuthor>();
+                    foreach(var author in authors) {
+                        if (dbMangaAuthors.Any(x => x.Author.Name == author)) continue;
+                        var dbAuthor = newAuthors.First(x => x.Name == author);
+                        newMangaAuthors.Add(new MangaAuthor { MangaId = dbManga.Id, AuthorId = dbAuthor.Id });
+                    }
+                    if (newMangaAuthors.Any()) DbContext.MangaAuthors.AddRange(newMangaAuthors);
+                }
             }
             if (newMangas.Any()) DbContext.Mangas.AddRange(newMangas);
 
@@ -179,7 +204,7 @@ namespace MangaMu.Plugin.Providers
                 break;
             }
             var listDto = JsonConvert.DeserializeObject<IEnumerable<MangaSourceDto>>(listJsonStr);
-            return listDto;
+            return listDto.Where(x => x.Lt != 0);
         }
 
         public CrawlFilter ExtractFilters(string lineStr)

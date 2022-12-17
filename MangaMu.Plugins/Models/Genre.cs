@@ -9,6 +9,6 @@ namespace MangaMu.Plugin.Models
         public string Name { get; set; } = string.Empty;
         public string Alias { get; set; } = string.Empty;
 
-        public virtual ICollection<Manga> Mangas { get; set; } = new List<Manga>();
+        public virtual ICollection<MangaGenre> MangasGenres { get; set; } = new List<MangaGenre>();
     }
 }

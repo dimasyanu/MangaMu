@@ -1,4 +1,5 @@
 ﻿using MangaMu.Plugin.Contracts;
+using MangaMu.Plugin.Models;
 using Slugify;
 
 namespace MangaMu.Plugin
@@ -8,9 +9,9 @@ namespace MangaMu.Plugin
         public abstract string Name { get; }
         public abstract string LogoUrl { get; }
 
-        public abstract IEnumerable<IManga> GetMangaList();
+        public abstract IEnumerable<Manga> GetMangaList();
         public abstract IEnumerable<IChapter> GetChapters(Guid mangaId);
-        public abstract IManga GetMangaInfo(Guid id);
+        public abstract Manga GetMangaInfo(Guid id);
         public abstract Task<bool> UpdateDatabase();
 
         public readonly string DbFilePath;

@@ -5,7 +5,7 @@
         public string H { get; set; } = string.Empty;
         public string I { get; set; } = string.Empty;
         public string L { get; set; } = string.Empty;
-        public string Lt { get; set; } = string.Empty;
+        public long Lt { get; set; }
         public string Ls { get; set; } = string.Empty;
         public string O { get; set; } = string.Empty;
         public string Ps { get; set; } = string.Empty;

@@ -11,10 +11,12 @@ namespace MangaMu.Test
         private Manga4Life _plugin;
         private PluginDbContext _dbContext;
 
-        [SetUp]
+        [OneTimeSetUp]
         public void SetUp()
         {
             _plugin = new Manga4Life();
+            _plugin.EnsureDbCreated();
+
             _dbContext = _plugin.DbContext;
             _dbContext.Database.ExecuteSqlRaw(@"
                 DELETE FROM Mangas;
@@ -45,13 +47,14 @@ namespace MangaMu.Test
         {
             var plugin = new Manga4Life();
             var success = false;
-            Assert.DoesNotThrow(() => {
-                success = plugin.UpdateDatabase().Result;
-            });
-            Assert.That(success, Is.True);
+            Assert.Multiple(() => {
+                Assert.DoesNotThrow(() => {
+                    success = plugin.UpdateDatabase().Result;
+                });
+                Assert.That(success, Is.True);
 
-            var mangas = _dbContext.Mangas.ToList();
-            Assert.That(mangas, Is.Not.Empty.And.Count.AtLeast(1000));
+                Assert.That(_dbContext.Mangas.Count(), Is.AtLeast(1000));
+            });
         }
     }
 }

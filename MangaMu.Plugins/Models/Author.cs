@@ -5,6 +5,7 @@
         public Guid Id { get; set; } = Guid.NewGuid();
         public string Name { get; set; } = string.Empty;
         
-        public virtual ICollection<Manga> Mangas { get; set; } = new List<Manga>();
+        // Many to many
+        public virtual ICollection<MangaAuthor> MangaAuthors { get; set; } = new List<MangaAuthor>();
     }
 }

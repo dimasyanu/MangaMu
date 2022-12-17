@@ -20,7 +20,6 @@ namespace MangaMu.Plugin
 
         public DbSet<MangaAuthor> MangaAuthors { get; set; }
         public DbSet<MangaGenre> MangaGenres { get; set; }
-        public DbSet<MangaStatus> MangaStatuses { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

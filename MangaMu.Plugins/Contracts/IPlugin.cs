@@ -1,4 +1,6 @@
-﻿namespace MangaMu.Plugin.Contracts
+﻿using MangaMu.Plugin.Models;
+
+namespace MangaMu.Plugin.Contracts
 {
     public interface IPlugin
     {
@@ -7,6 +9,6 @@
 
         Task<bool> UpdateDatabase();
         IEnumerable<IChapter> GetChapters(Guid mangaId);
-        IManga GetMangaInfo(Guid id);
+        Manga GetMangaInfo(Guid id);
     }
 }
