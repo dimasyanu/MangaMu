@@ -14,4 +14,13 @@
 	</ProjectReference>
   </ItemGroup>
 
+	<ItemGroup>
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+			<_Parameter1>MangaMu.Plugin.Manga4Life.Test</_Parameter1>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+			<_Parameter1>MangaMu</_Parameter1>
+		</AssemblyAttribute>
+	</ItemGroup>
+
 </Project>

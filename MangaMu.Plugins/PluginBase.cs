@@ -9,6 +9,8 @@ namespace MangaMu.Plugin
         public abstract string Name { get; }
         public abstract string LogoUrl { get; }
 
+        public abstract string DbFileName { get; }
+
         public abstract IEnumerable<Manga> GetMangaList();
         public abstract IEnumerable<IChapter> GetChapters(Guid mangaId);
         public abstract Manga GetMangaInfo(Guid id);
@@ -22,7 +24,9 @@ namespace MangaMu.Plugin
             SlugHelper = new SlugHelper();
             var baseDirPath = Path.GetDirectoryName(GetType().Assembly.Location);
             var dbDirPath = Path.Combine(baseDirPath, "Plugins", Name);
-            DbFilePath = Path.Combine(dbDirPath, $"data.db");
+            DbFilePath = Path.Combine(dbDirPath, DbFileName);
+
+            if (File.Exists(Path.Combine(baseDirPath, DbFileName))) return;
 
             if (!Directory.Exists(dbDirPath)) Directory.CreateDirectory(dbDirPath);
 
